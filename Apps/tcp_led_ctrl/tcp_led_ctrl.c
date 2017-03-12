@@ -12,7 +12,7 @@ static void trigger_led();
 
 
 
-int32_t process_one_frame(uint8_t *frame_data, uint16_t frame_len)
+int32_t process_one_frame(struct netconn *conn, uint8_t *frame_data, uint16_t frame_len)
 {
 	RECV_FRAME_PTR_t frame_ptr = (RECV_FRAME_PTR_t)frame_data;
 	uint8_t *data = (uint8_t *)(&(frame_ptr->data_len));
@@ -45,13 +45,13 @@ int32_t process_one_frame(uint8_t *frame_data, uint16_t frame_len)
 		case RGB_DATA:
 		{
 			fill_led_buffer(&(frame_ptr->rgb_data), frame_ptr->channel, frame_ptr->led_start, frame_ptr->led_end);
-			send_ack(RGB_DATA_ACK,STATUS_OK);
+			send_ack(conn, RGB_DATA_ACK,STATUS_OK);
 			break;
 		}
 		case RGB_TRIGGER:
 		{
 			trigger_led();
-			send_ack(RGB_TRIGGER_ACK,STATUS_OK);
+			send_ack(conn, RGB_TRIGGER_ACK,STATUS_OK);
 			break;
 		}
 		case HEART_BEAT:
@@ -157,13 +157,14 @@ static void trigger_led()
 	__set_PRIMASK(0);
 }
 
-void send_ack(uint8_t cmd, uint8_t status)
+void send_ack(struct netconn *conn, uint8_t cmd, uint8_t status)
 {
 
 	uint8_t data[7] = {FRAME_START,3,0,0,0,0,FRAME_END}; 
 	data[3] = cmd;
 	data[4] = status;
 	data[5] = data[1] ^ data[2] ^ data[3] ^ data[4];
+        netconn_write(conn, data, 7, NETCONN_COPY);
 	//es->state = ES_RECEIVED;
 //	es->pcb = tpcb;
 //	es->p_tx = pbuf_alloc(PBUF_TRANSPORT, 7 , PBUF_POOL);

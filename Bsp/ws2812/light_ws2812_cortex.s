@@ -3,6 +3,8 @@
 
 ;function declaration
 ;void ws2812_send(uint8_t *data, uint8_t *data1,uint8_t *data2,uint8_t *data3,uint8_t *data4,uint8_t *data5,int datlen);
+;see 
+; light_ws2812_conf.h for timing analysis
 
 ;usage of registers
 ; r0 *data0, first parameter passed by caller directly with r0

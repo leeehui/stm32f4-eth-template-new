@@ -74,6 +74,7 @@ ip4_addr_t gw;
 uint8_t IP_ADDRESS[4];
 uint8_t NETMASK_ADDRESS[4];
 uint8_t GATEWAY_ADDRESS[4];
+char *connect_ack = "sending tcp client message";
 
 /* USER CODE BEGIN 2 */
 static void tcpecho_thread(void *arg)
@@ -97,11 +98,14 @@ static void tcpecho_thread(void *arg)
 			IP4_ADDR(&ipaddr, 192,168,0,9);
 			netconn_connect(conn, &ipaddr,6000);
 			printf("conneted\n");
+                        
+                        netconn_write(conn, connect_ack, strlen(connect_ack), NETCONN_COPY);
+                        /*
                         __set_PRIMASK(1);
                         while(1)
                         {
                           test();
-                        }
+                        }*/
 			/* Tell connection to go into listening mode. */
 //			netconn_listen(conn);
 			while (1)
@@ -110,13 +114,20 @@ static void tcpecho_thread(void *arg)
 				
 				if(recv_err == ERR_OK)
 				{
+                                  /*
 					printf("received data\n");
+                                        
+                                        
 					do
 					{
 					netbuf_data(buf, &data, &len);
 					netconn_write(conn, data, len, NETCONN_COPY);
 					}
 					while (netbuf_next(buf) >= 0);
+                                        */
+                                        netbuf_data(buf, &data, &len);
+                                        process_one_frame(conn, data, len);
+                                        
 					netbuf_delete(buf);
 				}
 				/* Grab new connection. */
@@ -210,7 +221,7 @@ void MX_LWIP_Init(void)
   osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
   osThreadCreate (osThread(LinkThr), &link_arg);
 	
-  sys_thread_new("tcpecho_thread", tcpecho_thread, NULL, DEFAULT_THREAD_STACKSIZE, osPriorityNormal);
+  sys_thread_new("tcpecho_thread", tcpecho_thread, NULL, DEFAULT_THREAD_STACKSIZE, osPriorityRealtime);
 /* USER CODE BEGIN 3 */
 
 /* USER CODE END 3 */

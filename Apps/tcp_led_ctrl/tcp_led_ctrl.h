@@ -7,7 +7,7 @@
 #include "lwip/debug.h"
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
-
+#include "lwip/api.h"
 
 
 
@@ -57,8 +57,8 @@ typedef  __packed struct  RECV_FRAME
 }  RECV_FRAME_t, *RECV_FRAME_PTR_t;
 
 
-int32_t process_one_frame(uint8_t *frame_data, uint16_t frame_len);
-void send_ack(uint8_t cmd, uint8_t status);
+int32_t process_one_frame(struct netconn *conn, uint8_t *frame_data, uint16_t frame_len);
+void send_ack(struct netconn *conn, uint8_t cmd, uint8_t status);
 
 
 #endif
