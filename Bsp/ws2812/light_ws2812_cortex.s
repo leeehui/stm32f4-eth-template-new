@@ -1,4 +1,24 @@
 
+
+
+;function declaration
+;void ws2812_send(uint8_t *data, uint8_t *data1,uint8_t *data2,uint8_t *data3,uint8_t *data4,uint8_t *data5,int datlen);
+
+;usage of registers
+; r0 *data0, first parameter passed by caller directly with r0
+; r1 *data1, second parameter passed by caller directly with r1
+; r2 *data2, third parameter passed by caller directly with r2
+; r3 *data3, forth parameter passed by caller directly with r3
+; r4 *data4, fifth parameter passed by caller through Mem[stack+0]
+; r5 *data5, sixth parameter passed by caller through Mem[stack+4]
+; r6 datalen, fifth parameter passed by caller through Mem[stack+8]
+; r7 tempData for [*data]
+; r8 counter inside one byte, inited as 0x80, and right shift every byte_loop
+; r9 saved flag for deciding if corresponding pin should be cleared at T1
+; r10 port address for set/clear
+; r11 bit mask for specific pin <see reference manual of stm32f4>
+
+
 #include "light_ws2812_conf.h"
 	//RSEG    CODE:CODE(2)
         ;; Forward declaration of sections.
@@ -154,6 +174,7 @@ delay_1:
 			ws2812_DEL128
 #endif
 */
+        //T1: conditionally set 0
         ldr r11, =port_clr_ch_1     ;all channels use same port
         
         tst r9, #0x01
