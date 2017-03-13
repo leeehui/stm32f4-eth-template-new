@@ -48,6 +48,7 @@
 #include "lwip/netif.h"
 #include "ethernetif.h"
 #include "lwip/api.h"
+#include "tcp_led_ctrl.h"
 
 
 
@@ -100,12 +101,12 @@ static void tcpecho_thread(void *arg)
 			printf("conneted\n");
                         
                         netconn_write(conn, connect_ack, strlen(connect_ack), NETCONN_COPY);
-                        /*
+                        
                         __set_PRIMASK(1);
                         while(1)
                         {
                           test();
-                        }*/
+                        }
 			/* Tell connection to go into listening mode. */
 //			netconn_listen(conn);
 			while (1)
@@ -126,7 +127,8 @@ static void tcpecho_thread(void *arg)
 					while (netbuf_next(buf) >= 0);
                                         */
                                         netbuf_data(buf, &data, &len);
-                                        process_one_frame(conn, data, len);
+                                        send_ack(conn, RGB_DATA_ACK,STATUS_OK);
+                                        //process_one_frame(conn, data, len);
                                         
 					netbuf_delete(buf);
 				}

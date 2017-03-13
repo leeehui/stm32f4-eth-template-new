@@ -42,8 +42,8 @@ byte_loop:
         //mov32 r11, #0x40200418  ;use portB for all channels, do not need to set inside the loop
        
         //calculate flag
-        ldr r7, [r0]            ;data0
-        tst r7, r8
+        ldr r7, [r0]            ;data0 Note: cannot use post-indexing mode "ldr r7, [r0], #1"
+        tst r7, r8              ;because r0 can only be added outside byte_loop. in other words, r0 must be kept unchanged inside byte_loop
         it eq
         orreq r9, r9, #0x01
         
@@ -336,7 +336,7 @@ delay_3:
 byte_end:
         subs r6, r6, #1
         beq all_end
-        add r0, r0, #1    
+        add r0, r0, #1          ;
         add r1, r1, #1
         add r2, r2, #1
         add r3, r3, #1
